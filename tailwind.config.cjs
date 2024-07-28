@@ -5,11 +5,15 @@ module.exports = {
     "node_modules/preline/dist/*.js",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        allura: ["Allura", "cursive"],
+      },
+    },
   },
   plugins: [require("daisyui"), require("preline/plugin")],
   daisyui: {
-    themes: ["cupcake", "light"], // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
+    themes: ["bumblebee", "light"], // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
     darkTheme: "dark", // name of one of the included themes for dark mode
     base: true, // applies background color and foreground color for root element by default
     styled: true, // include daisyUI colors and design decisions for all components

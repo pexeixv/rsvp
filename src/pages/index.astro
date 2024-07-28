@@ -1,18 +1,28 @@
 ---
 import Form from "../components/Form.tsx";
+import Card from "../components/Card.astro";
+import "../tailwind.css";
 ---
 
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="bumblebee">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wedding RSVP</title>
+    <link rel="shortcut icon" href="//gavn.in/fav" type="image/x-icon" />
   </head>
   <body>
-    <section class="min-h-screen grid place-items-center">
-      <Form client:load />
-    </section>
-    <!-- <script is:inline src="/node_modules/preline/dist/preline.js"></script> -->
+    <main
+      class="min-h-screen flex max-lg:flex-col justify-evenly bg-left bg-cover bg-no-repeat lg:bg-center bg-amber-50 p-6 lg:p-8 gap-16"
+      style="background-image: url(/bg.webp);"
+    >
+      <section class="grid place-items-center">
+        <Card />
+      </section>
+      <section class="grid place-items-center">
+        <Form client:load />
+      </section>
+    </main>
   </body>
 </html>

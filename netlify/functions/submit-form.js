@@ -13,9 +13,11 @@ export const handler = async (event) => {
       body: JSON.stringify({ message: "Method not allowed" }),
     };
   }
+  const body = JSON.parse(event.body);
+  console.log(body.veg);
 
   try {
-    const { code, email, name, veg, nonVeg } = JSON.parse(event.body);
+    const { code, email, name, veg, nonVeg } = body;
 
     if (!code || !email || !name || veg === undefined || nonVeg === undefined) {
       return {
