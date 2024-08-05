@@ -2,9 +2,9 @@ import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
 config();
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const handler = async (event) => {
   if (event.httpMethod !== "POST") {
