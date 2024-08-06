@@ -15,7 +15,6 @@ export default function Home() {
         <section className="grid w-full place-items-center">
           <Form />
         </section>
-        <Link to="/admin">admin</Link>
       </main>
     </>
   );
