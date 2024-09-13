@@ -6,10 +6,13 @@ import { Minus, Plus, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import SHA256 from "crypto-js/sha256";
+
+const correctPasswordHash = import.meta.env.VITE_FORM_PASSWORD;
 
 interface FormInputs {
   email: string;
-  code: string;
+  password: string;
   name: string;
   veg: number;
   nonVeg: number;
@@ -19,7 +22,13 @@ const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address")
     .required("Email is required"),
-  code: Yup.string().required("Code is required"),
+  password: Yup.string()
+    .required("Password is required")
+    .test(
+      "password-match",
+      "Password incorrect!",
+      (value) => SHA256(value).toString() === correctPasswordHash
+    ),
   name: Yup.string().required("Name is required"),
   veg: Yup.number()
     .min(0, "Must be greater than or equal to 0")
@@ -72,6 +81,7 @@ function Form() {
   };
 
   const handleFormSubmission = async (form: FormInputs) => {
+    // Check if both vegetarian and non-vegetarian counts are zero
     if (form.veg === 0 && form.nonVeg === 0) {
       setCustomError(
         "There should be at least one Vegetarian or Non-vegetarian guest."
@@ -79,23 +89,37 @@ function Form() {
       return;
     }
 
-    setIsLoading(true);
+    setIsLoading(true); // Set loading state to true while processing
+
     try {
-      const response = await fetch("/.netlify/functions/submit-form", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
+      // Make the POST request to the serverless function
+      const response = await fetch(
+        "/.netlify/functions/firebase-form-handler",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form), // Send form data in the request body
+        }
+      );
+
+      // Check if the response was successful
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to submit form");
+      }
+
+      // If successful, show a success alert and reset the form
       alert("Form submitted successfully");
-      reset();
-      setVeg(0);
-      setNonVeg(0);
-      setIsLoading(false);
+      reset(); // Reset form fields
+      setVeg(0); // Reset veg count
+      setNonVeg(0); // Reset non-veg count
     } catch (error) {
-      alert("Error submitting form");
-      setIsLoading(false);
+      // Handle errors and show appropriate alert message
+      alert(`Error submitting form: ${error.message}`);
+    } finally {
+      setIsLoading(false); // Stop loading state once the process is done
     }
   };
 
@@ -108,18 +132,17 @@ function Form() {
       <h2 className="text-2xl font-bold lg:text-3xl">RSVP here</h2>
       <div className="grid gap-8 mt-4">
         <div>
-          <Label className="font-bold label" htmlFor="code">
-            Code
+          <Label className="font-bold label" htmlFor="name">
+            Name
           </Label>
           <Input
             className="w-full mt-2 input input-primary"
-            required
             type="text"
-            id="code"
-            {...register("code")}
+            id="name"
+            {...register("name")}
           />
-          {errors.code && (
-            <p className="mt-1 text-sm text-red-600">{errors.code.message}</p>
+          {errors.name && (
+            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
           )}
         </div>
         <div>
@@ -129,7 +152,6 @@ function Form() {
           <Input
             className="w-full mt-2 input input-primary"
             type="email"
-            required
             id="email"
             {...register("email")}
           />
@@ -138,18 +160,19 @@ function Form() {
           )}
         </div>
         <div>
-          <Label className="font-bold label" htmlFor="name">
-            Name
+          <Label className="font-bold label" htmlFor="password">
+            Password
           </Label>
           <Input
             className="w-full mt-2 input input-primary"
             type="text"
-            required
-            id="name"
-            {...register("name")}
+            id="password"
+            {...register("password")}
           />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+          {errors.password && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.password.message}
+            </p>
           )}
         </div>
       </div>

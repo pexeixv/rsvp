@@ -3,7 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import SHA256 from "crypto-js/sha256";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { DataTable } from "@/components/DataTable";
 import { ColumnDef } from "@tanstack/react-table";
 import {
@@ -13,6 +12,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { RefreshCwIcon } from "lucide-react";
+import { PasswordInput } from "@/components/ui/password-input";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
@@ -42,11 +42,6 @@ export const columns: ColumnDef[] = [
     enableSorting: true, // Enable sorting for text
   },
   {
-    accessorKey: "code",
-    header: "Code",
-    enableSorting: true, // Enable sorting for text
-  },
-  {
     accessorKey: "nonVeg",
     header: "Non-Veg Count",
     enableSorting: true, // Enable sorting for numeric values
@@ -63,7 +58,7 @@ export default function Admin() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [data, setData] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [password, setPassword] = useState("");
   const [kpis, setKpis] = useState([
     { label: "Total Submissions", value: 0 },
@@ -72,19 +67,20 @@ export default function Admin() {
     { label: "Non-Veg Count", value: 0 },
   ]);
 
-  async function fetchData() {
-    let { data, error } = await supabase
-      .from("submissions")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching data:", error);
-      setIsError(true);
-      return [];
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        "/.netlify/functions/get-firebase-submissions"
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
     }
-    return data;
-  }
+  };
   const getData = async () => {
     setIsLoading(true);
     if (isAuthenticated) {
@@ -99,7 +95,7 @@ export default function Admin() {
     getData();
   }, [isAuthenticated]);
 
-  function calculateKpis(data) {
+  const calculateKpis = (data) => {
     const total = data.length;
     const totalPeople = data.reduce(
       (sum, item) => sum + item.veg + item.nonVeg,
@@ -113,7 +109,7 @@ export default function Admin() {
       { label: "Veg Count", value: veg },
       { label: "Non-Veg Count", value: nonVeg },
     ]);
-  }
+  };
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
@@ -138,7 +134,7 @@ export default function Admin() {
           >
             Enter Password
           </Label>
-          <Input
+          <PasswordInput
             type="password"
             id="password"
             value={password}
