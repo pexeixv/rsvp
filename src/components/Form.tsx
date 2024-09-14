@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import SHA256 from "crypto-js/sha256";
+import { useToast } from "@/hooks/use-toast"; // Import useToast
 
 const correctPasswordHash = import.meta.env.VITE_FORM_PASSWORD;
 
@@ -47,6 +48,7 @@ function Form() {
     reset,
   } = useForm<FormInputs>({ resolver: yupResolver(validationSchema) });
 
+  const { toast } = useToast(); // Get the toast function
   const [customError, setCustomError] = useState("");
   const [veg, setVeg] = useState(0);
   const [nonVeg, setNonVeg] = useState(0);
@@ -81,7 +83,6 @@ function Form() {
   };
 
   const handleFormSubmission = async (form: FormInputs) => {
-    // Check if both vegetarian and non-vegetarian counts are zero
     if (form.veg === 0 && form.nonVeg === 0) {
       setCustomError(
         "There should be at least one Vegetarian or Non-vegetarian guest."
@@ -89,10 +90,9 @@ function Form() {
       return;
     }
 
-    setIsLoading(true); // Set loading state to true while processing
+    setIsLoading(true);
 
     try {
-      // Make the POST request to the serverless function
       const response = await fetch(
         "/.netlify/functions/firebase-form-handler",
         {
@@ -100,26 +100,30 @@ function Form() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(form), // Send form data in the request body
+          body: JSON.stringify(form),
         }
       );
 
-      // Check if the response was successful
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to submit form");
       }
 
-      // If successful, show a success alert and reset the form
-      alert("Form submitted successfully");
-      reset(); // Reset form fields
-      setVeg(0); // Reset veg count
-      setNonVeg(0); // Reset non-veg count
+      toast({
+        title: "Success!",
+        description: "Form submitted successfully",
+      });
+      reset();
+      setVeg(0);
+      setNonVeg(0);
     } catch (error) {
-      // Handle errors and show appropriate alert message
-      alert(`Error submitting form: ${error.message}`);
+      toast({
+        title: "Error",
+        description: `Error submitting form: ${error.message}`,
+        variant: "destructive",
+      });
     } finally {
-      setIsLoading(false); // Stop loading state once the process is done
+      setIsLoading(false);
     }
   };
 
@@ -255,7 +259,7 @@ function Form() {
         </div>
       </div>
       {customError && (
-        <p className="mt-2 text-sm text-red-600">{customError}</p>
+        <p className="mt-4 text-sm text-red-600">{customError}</p>
       )}
       <Button
         type="submit"

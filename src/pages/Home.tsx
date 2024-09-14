@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
 import Card from "../components/Card";
 import Form from "../components/Form";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Home() {
   return (
@@ -16,6 +16,7 @@ export default function Home() {
           <Form />
         </section>
       </main>
+      <Toaster />
     </>
   );
 }
