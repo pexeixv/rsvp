@@ -28,7 +28,9 @@ const validationSchema = Yup.object().shape({
     .test(
       "password-match",
       "Password incorrect!",
-      (value) => SHA256(value).toString() === correctPasswordHash
+      (value) =>
+        SHA256(value.toLocaleLowerCase().trim()).toString() ===
+        correctPasswordHash
     ),
   name: Yup.string().required("Name is required"),
   veg: Yup.number()
