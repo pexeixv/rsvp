@@ -28,19 +28,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface Transaction {
-  tID: string;
-  createdAt: string;
-  sender: string;
-  receiver: string;
-  amount: string;
-  date: string;
-  status: number;
+interface Submission {
+  email: string;
+  password: string;
+  name: string;
+  veg: number;
+  nonVeg: number;
 }
 
 interface DataTableProps {
-  columns: ColumnDef<Transaction, any>[];
-  data: Transaction[];
+  columns: ColumnDef<Submission, any>[];
+  data: Submission[];
 }
 
 export function DataTable({ columns, data }: DataTableProps) {
@@ -108,18 +106,23 @@ export function DataTable({ columns, data }: DataTableProps) {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {header.isPlaceholder ? null : (
+                      <button className="flex items-center cursor-pointer w-fit">
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() === "asc" && " ▲"}
+                        {header.column.getIsSorted() === "desc" && " ▼"}
+                      </button>
+                    )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>

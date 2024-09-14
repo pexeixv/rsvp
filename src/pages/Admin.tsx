@@ -21,44 +21,51 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const columns: ColumnDef[] = [
   {
-    accessorKey: "created_at",
+    accessorKey: "createdAt",
     header: "Created At",
     cell: ({ row }) => {
-      const date = new Date(row.getValue("created_at"));
+      const date = new Date(row.getValue("createdAt"));
       const formatted = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
       return <div className="font-medium">{formatted}</div>;
     },
-    enableSorting: true, // Ensure sorting is enabled for this column
-    sortingFn: "datetime", // Custom sorting function for date
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const dateA = new Date(a.original.createdAt);
+      const dateB = new Date(b.original.createdAt);
+      return dateA.getTime() - dateB.getTime(); // Sort by date in ascending order
+    },
   },
   {
     accessorKey: "name",
     header: "Name",
-    enableSorting: true, // Enable sorting for text
+    enableSorting: true,
+    sortingFn: "alphanumeric", // Use alphanumeric sorting for strings
   },
   {
     accessorKey: "email",
     header: "Email",
-    enableSorting: true, // Enable sorting for text
+    enableSorting: true,
+    sortingFn: "alphanumeric", // Use alphanumeric sorting for strings
   },
   {
     accessorKey: "nonVeg",
     header: "Non-Veg Count",
-    enableSorting: true, // Enable sorting for numeric values
-    sortingFn: "basic", // Sorting function for numeric values
+    enableSorting: true,
+    sortingFn: "basic", // Use basic sorting for numbers
   },
   {
     accessorKey: "veg",
     header: "Veg Count",
-    enableSorting: true, // Enable sorting for numeric values
-    sortingFn: "basic", // Sorting function for numeric values
+    enableSorting: true,
+    sortingFn: "basic", // Use basic sorting for numbers
   },
 ];
+
 export default function Admin() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [data, setData] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [kpis, setKpis] = useState([
     { label: "Total Submissions", value: 0 },
