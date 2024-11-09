@@ -17,7 +17,12 @@ module.exports = {
       },
     },
     extend: {
+      backgroundImage: {
+        "gold-gradient":
+          "linear-gradient(to bottom, #f3e5ab, #e6c972, #b89540)",
+      },
       fontFamily: {
+        baskerville: ["Libre Baskerville", "serif"],
         greatvibes: ["Great Vibes", "cursive"],
       },
       colors: {
