@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import SHA256 from "crypto-js/sha256";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,13 +10,13 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { RefreshCwIcon } from "lucide-react";
+import { LogOutIcon, RefreshCwIcon } from "lucide-react";
 import { PasswordInput } from "@/components/ui/password-input";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
 const correctPasswordHash = import.meta.env.VITE_ADMIN_PASSWORD;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const columns: ColumnDef[] = [
   {
@@ -32,32 +31,32 @@ export const columns: ColumnDef[] = [
     sortingFn: (a, b) => {
       const dateA = new Date(a.original.createdAt);
       const dateB = new Date(b.original.createdAt);
-      return dateA.getTime() - dateB.getTime(); // Sort by date in ascending order
+      return dateA.getTime() - dateB.getTime();
     },
   },
   {
     accessorKey: "name",
     header: "Name",
     enableSorting: true,
-    sortingFn: "alphanumeric", // Use alphanumeric sorting for strings
+    sortingFn: "alphanumeric",
   },
   {
     accessorKey: "email",
     header: "Email",
     enableSorting: true,
-    sortingFn: "alphanumeric", // Use alphanumeric sorting for strings
+    sortingFn: "alphanumeric",
   },
   {
     accessorKey: "nonVeg",
     header: "Non-Veg Count",
     enableSorting: true,
-    sortingFn: "basic", // Use basic sorting for numbers
+    sortingFn: "basic",
   },
   {
     accessorKey: "veg",
     header: "Veg Count",
     enableSorting: true,
-    sortingFn: "basic", // Use basic sorting for numbers
+    sortingFn: "basic",
   },
 ];
 
@@ -67,12 +66,23 @@ export default function Admin() {
   const [data, setData] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
+  const { toast } = useToast();
   const [kpis, setKpis] = useState([
     { label: "Total Submissions", value: 0 },
     { label: "Total Count", value: 0 },
     { label: "Veg Count", value: 0 },
     { label: "Non-Veg Count", value: 0 },
   ]);
+
+  useEffect(() => {
+    const savedPassword = localStorage.getItem("RSVP_GAVN_IN");
+    if (savedPassword) {
+      const inputPasswordHash = SHA256(savedPassword).toString();
+      if (inputPasswordHash === correctPasswordHash) {
+        setIsAuthenticated(true);
+      }
+    }
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -88,6 +98,7 @@ export default function Admin() {
       console.error("Error fetching submissions:", error);
     }
   };
+
   const getData = async () => {
     setIsLoading(true);
     if (isAuthenticated) {
@@ -120,12 +131,31 @@ export default function Admin() {
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
-    const inputPasswordHash = SHA256(password).toString();
+    const inputPasswordHash = SHA256(password.trim().toLowerCase()).toString();
     if (inputPasswordHash === correctPasswordHash) {
       setIsAuthenticated(true);
+      localStorage.setItem("RSVP_GAVN_IN", password);
+      toast({
+        title: "Success!",
+        description: "You are now authenticated.",
+      });
     } else {
-      alert("Incorrect password");
+      toast({
+        title: "Error",
+        description: "Incorrect password. Please try again.",
+        variant: "destructive",
+      });
     }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("RSVP_GAVN_IN");
+    setIsAuthenticated(false);
+    setPassword("");
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully.",
+    });
   };
 
   return (
@@ -142,7 +172,6 @@ export default function Admin() {
             Enter Password
           </Label>
           <PasswordInput
-            type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -156,17 +185,47 @@ export default function Admin() {
 
       {isAuthenticated && (
         <>
-          <div className="flex items-center justify-between mb-12">
+          <div className="flex justify-between gap-4 mb-8 sm:items-center max-sm:flex-col">
             <h1 className="text-2xl font-bold lg:text-4xl">Submissions Data</h1>
-            <Button onClick={getData} variant="secondary" size="sm">
-              <RefreshCwIcon />
-            </Button>
+            <div className="flex gap-4">
+              <Button
+                onClick={getData}
+                variant="secondary"
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <RefreshCwIcon className="size-4" />
+                Refresh Data
+              </Button>
+              <Button
+                onClick={logout}
+                variant="secondary"
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <LogOutIcon className="size-4" />
+                Logout
+              </Button>
+            </div>
           </div>
-          {isLoading && <div>Loading..</div>}
+          {isLoading && (
+            <section>
+              <div className="grid grid-cols-2 gap-4 mb-4 lg:grid-cols-4">
+                {[1, 2, 3, 4].map((_, index) => (
+                  <Skeleton key={index} className="w-full h-24" />
+                ))}
+              </div>
+              <div className="flex justify-between mt-8">
+                <Skeleton className="w-full h-10 max-w-lg" />
+                <Skeleton className="w-full h-10 max-w-24" />
+              </div>
+              <Skeleton className="w-full h-[600px] mt-4" />
+            </section>
+          )}
           {isError && <div>Error loading data.</div>}
           {!isLoading && !isError && (
             <div>
-              <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 mb-4 lg:grid-cols-4">
                 {kpis.map((kpi) => (
                   <Card key={kpi.label}>
                     <CardHeader>
@@ -181,6 +240,7 @@ export default function Admin() {
           )}
         </>
       )}
+      <Toaster />
     </div>
   );
 }

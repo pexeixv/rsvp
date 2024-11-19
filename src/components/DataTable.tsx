@@ -65,7 +65,7 @@ export function DataTable({ columns, data }: DataTableProps) {
 
   return (
     <>
-      <div className="flex items-center justify-between mt-8">
+      <div className="flex items-center justify-between gap-4 mt-8">
         <Input
           placeholder="Search by name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
