@@ -18,48 +18,44 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const correctPasswordHash = import.meta.env.VITE_ADMIN_PASSWORD;
 
-export const columns: ColumnDef[] = [
+export const columns: ColumnDef<Record<string, any>>[] = [
   {
     accessorKey: "createdAt",
     header: "Created At",
     cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"));
-      const formatted = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-      return <div className="font-medium">{formatted}</div>;
+      return <div className="font-medium">{row.original.createdAt}</div>;
     },
     enableSorting: true,
-    sortingFn: (a, b) => {
-      const dateA = new Date(a.original.createdAt);
-      const dateB = new Date(b.original.createdAt);
-      return dateA.getTime() - dateB.getTime();
-    },
   },
   {
     accessorKey: "name",
     header: "Name",
     enableSorting: true,
     sortingFn: "alphanumeric",
+    cell: ({ row }) => <div>{row.getValue<string>("name")}</div>,
   },
   {
     accessorKey: "email",
     header: "Email",
     enableSorting: true,
     sortingFn: "alphanumeric",
+    cell: ({ row }) => <div>{row.getValue<string>("email")}</div>,
   },
   {
     accessorKey: "nonVeg",
     header: "Non-Veg Count",
     enableSorting: true,
     sortingFn: "basic",
+    cell: ({ row }) => <div>{row.getValue<number>("nonVeg")}</div>,
   },
   {
     accessorKey: "veg",
     header: "Veg Count",
     enableSorting: true,
     sortingFn: "basic",
+    cell: ({ row }) => <div>{row.getValue<number>("veg")}</div>,
   },
 ];
-
 export default function Admin() {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);

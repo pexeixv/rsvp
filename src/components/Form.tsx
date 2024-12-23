@@ -22,6 +22,7 @@ interface FormInputs {
 const validationSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address")
+    .trim()
     .required("Email is required"),
   password: Yup.string()
     .required("Password is required")
@@ -32,7 +33,7 @@ const validationSchema = Yup.object().shape({
         SHA256(value.toLocaleLowerCase().trim()).toString() ===
         correctPasswordHash
     ),
-  name: Yup.string().required("Name is required"),
+  name: Yup.string().trim().required("Name is required"),
   veg: Yup.number()
     .min(0, "Must be greater than or equal to 0")
     .required("Vegetarian count is required"),
@@ -50,7 +51,7 @@ function Form() {
     reset,
   } = useForm<FormInputs>({ resolver: yupResolver(validationSchema) });
 
-  const { toast } = useToast(); // Get the toast function
+  const { toast } = useToast();
   const [customError, setCustomError] = useState("");
   const [veg, setVeg] = useState(0);
   const [nonVeg, setNonVeg] = useState(0);
@@ -114,6 +115,7 @@ function Form() {
       toast({
         title: "Success!",
         description: "Form submitted successfully",
+        variant: "success",
       });
       reset();
       setVeg(0);
@@ -122,7 +124,7 @@ function Form() {
       toast({
         title: "Error",
         description: `Error submitting form: ${error.message}`,
-        variant: "destructive",
+        variant: "error",
       });
     } finally {
       setIsLoading(false);
