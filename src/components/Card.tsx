@@ -4,13 +4,13 @@ export default function Card() {
       <img src="/rings.jpg" alt="" className="h-[200px] w-full object-cover" />
       <div className="p-8">
         <h1 className="flex flex-col text-4xl text-center lg:text-5xl font-baskerville drop-shadow-sm">
-          <span className="uppercase  bg-gold-gradient text-transparent bg-clip-text">
+          <span className="text-transparent uppercase bg-gold-gradient bg-clip-text">
             Sheldon
           </span>
           <span className="text-[0.6em] font-thin relative lg:bottom-0.5 font-greatvibes  bg-gold-gradient text-transparent bg-clip-text max-lg:-my-1">
             -and-
           </span>
-          <span className="uppercase  bg-gold-gradient text-transparent bg-clip-text">
+          <span className="text-transparent uppercase bg-gold-gradient bg-clip-text">
             Ishitta
           </span>
         </h1>
@@ -22,7 +22,7 @@ export default function Card() {
 
           <div className="grid gap-8 pt-4 mt-4 text-center border-t lg:grid-cols-2 max-lg:divide-y lg:divide-x">
             <div className="flex flex-col">
-              <h2 className="text-xl lg:text-2xl  font-baskerville uppercase  bg-gold-gradient text-transparent bg-clip-text drop-shadow-md">
+              <h2 className="text-xl text-transparent uppercase lg:text-2xl font-baskerville bg-gold-gradient bg-clip-text drop-shadow-md">
                 Nuptials
               </h2>
 
@@ -45,7 +45,7 @@ export default function Card() {
             </div>
 
             <div className="flex flex-col max-lg:border-t max-lg:pt-4">
-              <h2 className="text-xl lg:text-2xl  font-baskerville uppercase   bg-gold-gradient text-transparent bg-clip-text drop-shadow-md">
+              <h2 className="text-xl text-transparent uppercase lg:text-2xl font-baskerville bg-gold-gradient bg-clip-text drop-shadow-md">
                 Reception
               </h2>
               <div>
@@ -55,9 +55,9 @@ export default function Card() {
 
               <div>
                 <p className="mt-2 font-bold">Location</p>
-                <p>RSI Club, Pune Camp</p>
+                <p>Hotel Shree Panchratna, Sangamvadi, Pune</p>
                 <a
-                  href="https://maps.app.goo.gl/gSz4orXGt1LVisuH6"
+                  href="https://maps.app.goo.gl/LfYuuL65qCzh7mTt5"
                   target="_blank"
                   className="text-xs underline"
                 >
